@@ -10,6 +10,6 @@ import os
 
 pg.font.init()
 #Font to use while the game is running (i.e. the game has started and no one lost yet)
-GAME_FONT_ACTIVE = pg.font.Font(os.path.join('Assets', 'Arcade.ttf'), 50)
+GAME_FONT_ACTIVE = pg.font.Font(os.path.join('Assets', 'Arcade.ttf'), 40)
 #Font to use for static states (i.e. the start button and the end of game text "player x won")
 GAME_FONT_INACTIVE = pg.font.Font(os.path.join('Assets', 'Arcade.ttf'), 70)

@@ -8,8 +8,6 @@
 
 # import statements:
 import pygame as pg
-# import sys
-# import os
 import game_colors as gc
 import game_images as gi
 import game_fonts as gf
@@ -28,7 +26,7 @@ pg.init()
 # the FPS and the event types
 W_WIDTH, W_HEIGHT = 1400, 700
 WINDOW = pg.display.set_mode((W_WIDTH, W_HEIGHT),pg.RESIZABLE)
-pg.display.set_caption("SPACESHIP VS ALIEN!")
+pg.display.set_caption("SPACE DUEL!")
 FPS = 120
 SHIP_HIT = pg.USEREVENT + 1
 ALIEN_HIT = pg.USEREVENT + 2
@@ -41,29 +39,16 @@ health_font = gf.GAME_FONT_ACTIVE
 spaceship_image = gi.SPACESHIP_FINAL_IMAGE
 spaceship_image_flipped = gi.FLIPPED_SPACESHIP_IMAGE
 alien_image = gi.ALIEN_FINAL_IMAGE
-background_image = gi.BACKGROUND_FINAL_IMAGE
-
+active_background_image = gi.GAMEPLAY_BACKGROUND_FINAL_IMAGE
+inactive_background_image = gi.ENDGAME_BACKGROUND_FINAL_IMAGE
 # Define control keys for each player as dictionaries:
 spaceship_keys = {'U': pg.K_w, 'D': pg.K_s, 'L': pg.K_a, 'R': pg.K_d}
 alien_keys = {'U': pg.K_UP, 'D': pg.K_DOWN, 'L': pg.K_LEFT, 'R': pg.K_RIGHT}
 
 
 # Create players for the game
-spaceship = Player((W_WIDTH/5)-gi.SCALED_SPACESHIP_WIDTH/2,
-                (W_HEIGHT/2)-gi.SCALED_SPACESHIP_HEIGHT/2,
-                gi.SPACESHIP_FINAL_WIDTH,
-                gi.SPACESHIP_FINAL_HEIGHT,
-                spaceship_image,
-                spaceship_keys)
-alien = Player((4*W_WIDTH/5)-gi.SCALED_ALIEN_WIDTH/2,
-                (W_HEIGHT/2)-gi.SCALED_ALIEN_HEIGHT/2,
-                gi.ALIEN_FINAL_WIDTH,
-                gi.ALIEN_FINAL_HEIGHT,
-                alien_image,
-                alien_keys)
 
-spaceship_health_text = health_font.render("Player 1 Health: " + str(spaceship.health), 1, gc.R_FIRE1)
-alien_health_text = health_font.render("Player 2 Health: " + str(alien.health), 1, gc.B_FIRE1)
+
 
 # Define a function to handle bullets collisions and offscreen status:
 def handle_bullets(spaceship, alien, spaceship_bullets, alien_bullets):
@@ -91,32 +76,46 @@ def handle_bullets(spaceship, alien, spaceship_bullets, alien_bullets):
         #if enemy bullet collides with player, remove it from the enemy_bullet list
         elif bullet.isOffScreen(W_WIDTH):
             alien_bullets.remove(bullet)
+ 
+def draw_text_with_outline(x, y, text, font, color, outline_color, surface, thickness = 2): 
+    
+    textobj = font.render(text, 1, color)
+    outlineobj = font.render(text, 1, outline_color)
+    (x,y) = (x - textobj.get_width()/2, y - textobj.get_height()/2)
+    for i in range(1, thickness):
+        surface.blit(outlineobj, (x-i, y-i))
+        surface.blit(outlineobj, (x+i, y-i))
+        surface.blit(outlineobj, (x-i, y+i))
+        surface.blit(outlineobj, (x+i, y+i))
+    surface.blit(textobj, (x,y))
+    
+    
+    
     
 # Define a function to draw the window
-def draw_window(spaceship, alien, spaceship_bullets = [], alien_bullets = [], spaceship_health_text = spaceship_health_text, alien_health_text = alien_health_text):
-    spaceship_winning_text = win_font.render("Player 1 Wins!", 1, gc.R_FIRE1)
-    alien_winning_text = win_font.render("Player 2 Wins!", 1, gc.B_FIRE1)
+def draw_window(spaceship, alien, spaceship_bullets = [], alien_bullets = [], spaceship_health_string = "", alien_health_string = ""):
+    spaceship_winning_string = "SPACESHIP WINS!"
+    alien_winning_string = "ALIEN WINS!"
+    spaceship_health_string = "Spaceship Health: " + str(spaceship.health)
+    alien_health_string = "Alien Health: " + str(alien.health)
+
     if spaceship.health <= 0 or alien.health <= 0:
-        WINDOW.fill(gc.BLACK)
-        if spaceship.health <= 0:
-            WINDOW.blit(alien_winning_text,
-                        (
-                            (W_WIDTH - spaceship_winning_text.get_width())/2,
-                            (W_HEIGHT - spaceship_winning_text.get_height())/2
-                         ))
-        elif alien.health <= 0:
-            WINDOW.blit(spaceship_winning_text,
-                        (
-                            (W_WIDTH - spaceship_winning_text.get_width())/2,
-                            (W_HEIGHT - spaceship_winning_text.get_height())/2
-                         ))
-            
+        WINDOW.blit(inactive_background_image, (0,0))
+        if alien.health <= 0:
+            WINDOW.blit(gi.SPACESHIP_WIN_IMAGE, (W_WIDTH/2 - gi.SPACESHIP_WIN_IMAGE_WIDTH/2, W_HEIGHT/2 - gi.SPACESHIP_WIN_IMAGE_HEIGHT/2))
+            draw_text_with_outline(W_WIDTH/2, 40 + W_HEIGHT/2 + gi.SPACESHIP_WIN_IMAGE_HEIGHT/2, spaceship_winning_string, win_font, gc.R_FIRE1, gc.BLACK, WINDOW, 3)
+      
+        elif spaceship.health <= 0:
+            WINDOW.blit(gi.ALIEN_WIN_IMAGE, (W_WIDTH/2 - gi.ALIEN_WIN_IMAGE_WIDTH/2, W_HEIGHT/2 - gi.ALIEN_WIN_IMAGE_HEIGHT/2))
+            draw_text_with_outline(W_WIDTH/2, 40 + W_HEIGHT/2 + gi.ALIEN_WIN_IMAGE_HEIGHT/2, alien_winning_string, win_font, gc.B_FIRE1, gc.BLACK, WINDOW, 3)
         pg.display.update()
+        
     else:
-        WINDOW.blit(background_image, (0,0))
-        WINDOW.blit(spaceship_health_text, (W_WIDTH/8, W_HEIGHT/14))
-        WINDOW.blit(alien_health_text, (7*W_WIDTH/8 - alien_health_text.get_width(), W_HEIGHT/14))
-#        WINDOW.blit(player_2_health_text, (W_WIDTH/8, W_HEIGHT/))
+        WINDOW.blit(active_background_image, (0,0))
+        
+        draw_text_with_outline(W_WIDTH//7, W_HEIGHT/14, spaceship_health_string, health_font, gc.R_FIRE1, gc.BLACK, WINDOW, 3)
+        draw_text_with_outline(6*W_WIDTH//7, W_HEIGHT/14, alien_health_string, health_font, gc.B_FIRE1, gc.BLACK, WINDOW, 3)
+       
         if spaceship.x > alien.x:
             WINDOW.blit(spaceship_image_flipped, (spaceship.x,spaceship.y))
             WINDOW.blit(alien_image, (alien.x,alien.y))
@@ -133,6 +132,19 @@ def draw_window(spaceship, alien, spaceship_bullets = [], alien_bullets = [], sp
 # Define the main function
 def main():
 
+    # Create players for the game
+    spaceship = Player((W_WIDTH/5)-gi.SCALED_SPACESHIP_WIDTH/2,
+                (W_HEIGHT/2)-gi.SCALED_SPACESHIP_HEIGHT/2,
+                gi.SPACESHIP_FINAL_WIDTH,
+                gi.SPACESHIP_FINAL_HEIGHT,
+                spaceship_image,
+                spaceship_keys)
+    alien = Player((4*W_WIDTH/5)-gi.SCALED_ALIEN_WIDTH/2,
+                (W_HEIGHT/2)-gi.SCALED_ALIEN_HEIGHT/2,
+                gi.ALIEN_FINAL_WIDTH,
+                gi.ALIEN_FINAL_HEIGHT,
+                alien_image,
+                alien_keys)
     
     # Create a list to store the bullets of each player
     spaceship_bullets = []
@@ -144,10 +156,16 @@ def main():
     
     # Create a boolean to control the game loop
     isRunning = True
+    
+    # define status for the game (i.e. start screen, gameplay, end screen) to control the game loop
+    # isStartScreen = True
+    # isGamePlay = False
+    # isEndScreen = False
+
+    
     while isRunning:
         
         clock.tick(FPS)
-        
         for event in pg.event.get():
             if event.type == pg.QUIT: #quitting the game
                 isRunning = False
@@ -215,9 +233,7 @@ def main():
         draw_window(spaceship,
                     alien,
                     spaceship_bullets,
-                    alien_bullets,
-                    spaceship_health_text,
-                    alien_health_text)
+                    alien_bullets)
         
         
     # Quit Pygame

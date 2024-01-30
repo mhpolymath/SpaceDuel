@@ -6,7 +6,7 @@ import pygame as pg
 import math
 
 class Bullet():
-    #hiiii
+    
     BULLET_WIDTH = 15
     BULLET_HEIGHT = 8
     BULLET_VELOCITY = 8
@@ -16,12 +16,12 @@ class Bullet():
                  x,
                  y,
                  colorSet,
-                 ):
+                 direction):
         
         self.x = x # x coordinate
         self.y = y # y coordinate
         self.colorSet = colorSet # color of the bullet
-        self.direction = 1 # direction of the bullet
+        self.direction = direction # direction of the bullet
         self.rect = pg.Rect(x, y, self.BULLET_WIDTH, self.BULLET_HEIGHT) # rectangle around the bullet (similar to hitbox)
     
     def draw(self, window):
@@ -29,7 +29,6 @@ class Bullet():
         pg.draw.rect(window, color, self.rect)
     
     def move(self, Player1, Player2):
-        self.direction = self.setDirection(Player1, Player2)
         self.x += self.BULLET_VELOCITY * self.direction
         self.rect.x = self.x
     
@@ -39,8 +38,3 @@ class Bullet():
     def collision(self, obj):
         return self.rect.colliderect(obj)
     
-    def setDirection(self, Player1, Player2):
-        if Player1.x < Player2.x:
-            self.direction = 1
-        else:
-            self.direction = -1

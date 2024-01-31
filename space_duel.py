@@ -1,4 +1,4 @@
-#TODO: 
+#TODO: !!!Check the game state screens comments!!!
 # - make sure you are using consistent naming conventions. noticed issues include: 
 #       you sometimes use (player1 and player2), (player_1 and player_2), 
 #       (player and enemy), and (spaceship and alien)
@@ -14,7 +14,7 @@ import game_fonts as gf
 
 from Player import Player
 from Bullet import Bullet
-
+from Button import Button
 
 
 # initialize pygame modules for safe use
@@ -34,6 +34,11 @@ ALIEN_HIT = pg.USEREVENT + 2
 #import fonts for the game
 win_font = gf.GAME_FONT_INACTIVE
 health_font = gf.GAME_FONT_ACTIVE
+
+#import button images for the game
+start_button_image = gi.START_BUTTON_FINAL_IMAGE
+exit_button_image = gi.EXIT_BUTTON_FINAL_IMAGE
+reset_button_image = gi.RESET_BUTTON_FINAL_IMAGE
 
 # import images for the game
 spaceship_image = gi.SPACESHIP_FINAL_IMAGE
@@ -108,8 +113,6 @@ def draw_window(spaceship, alien, spaceship_bullets = [], alien_bullets = [], sp
         elif spaceship.health <= 0:
             WINDOW.blit(gi.ALIEN_WIN_IMAGE, (W_WIDTH/2 - gi.ALIEN_WIN_IMAGE_WIDTH/2, W_HEIGHT/2 - gi.ALIEN_WIN_IMAGE_HEIGHT/2))
             draw_text_with_outline(W_WIDTH/2, 40 + W_HEIGHT/2 + gi.ALIEN_WIN_IMAGE_HEIGHT/2, alien_winning_string, win_font, gc.B_FIRE1, gc.BLACK, WINDOW, 3)
-        pg.display.update()
-        
     else:
         WINDOW.blit(active_background_image, (0,0))
         
@@ -127,8 +130,72 @@ def draw_window(spaceship, alien, spaceship_bullets = [], alien_bullets = [], sp
         for bullet in alien_bullets:
             bullet.draw(WINDOW)
         
+    pg.display.update()
+
+
+#game state variable: 0 for start screen, 1 for gameplay, 2 for end screen, -1 for quitting the game
+game_state = 2
+
+#added start screen and end screen functions
+#end screen need to show the winner and a reset button and an exit button
+#integrate the start screen and end screen functions from and into the main function
+
+def start_screen():
+    global game_state
+    clock = pg.time.Clock()
+    while True:
+        clock.tick(FPS)
+        for event in pg.event.get():
+            if event.type == pg.QUIT: #quitting the game
+                game_state = -1
+                return
+            #handle mouse click on start button
+            if event.type == pg.MOUSEBUTTONDOWN:
+                mouse_pos = pg.mouse.get_pos()
+                if start_button.is_hover(mouse_pos):
+                    game_state = 1
+                    return
+                elif exit_button.is_hover(mouse_pos):
+                    game_state = -1
+                    return
+        
+        
+        WINDOW.blit(inactive_background_image, (0,0))
+        start_button = Button(W_WIDTH/3 - gi.START_BUTTON_FINAL_WIDTH/2, W_HEIGHT/2 - gi.START_BUTTON_FINAL_HEIGHT/2, gi.START_BUTTON_FINAL_WIDTH, gi.START_BUTTON_FINAL_HEIGHT, start_button_image)
+        exit_button = Button(2*W_WIDTH/3 - gi.EXIT_BUTTON_FINAL_WIDTH/2, W_HEIGHT/2 - gi.EXIT_BUTTON_FINAL_HEIGHT/2, gi.EXIT_BUTTON_FINAL_WIDTH, gi.EXIT_BUTTON_FINAL_HEIGHT, exit_button_image)
+        start_button.draw(WINDOW)
+        print("start button width: ", start_button.width, "start button height: ", start_button.height)
+        print("exit button width: ", exit_button.width, "exit button height: ", exit_button.height)
+        exit_button.draw(WINDOW)
         pg.display.update()
-   
+
+def end_screen():
+    
+    global game_state
+    clock = pg.time.Clock()
+    while True:
+        clock.tick(FPS)
+        for event in pg.event.get():
+            if event.type == pg.QUIT: #quitting the game
+                game_state = -1
+                return
+            #handle mouse click on start button
+            if event.type == pg.MOUSEBUTTONDOWN:
+                mouse_pos = pg.mouse.get_pos()
+                if reset_button.is_hover(mouse_pos):
+                    game_state = 1
+                    return
+                elif exit_button.is_hover(mouse_pos):
+                    game_state = -1
+                    return
+    
+        WINDOW.blit(inactive_background_image, (0,0))
+        reset_button = Button(W_WIDTH/3 - gi.RESET_BUTTON_FINAL_WIDTH/2, W_HEIGHT/2 - gi.RESET_BUTTON_FINAL_HEIGHT/2, gi.RESET_BUTTON_FINAL_WIDTH, gi.RESET_BUTTON_FINAL_HEIGHT, reset_button_image)
+        reset_button.draw(WINDOW)
+        exit_button = Button(2*W_WIDTH/3 - gi.EXIT_BUTTON_FINAL_WIDTH/2, W_HEIGHT/2 - gi.EXIT_BUTTON_FINAL_HEIGHT/2, gi.EXIT_BUTTON_FINAL_WIDTH, gi.EXIT_BUTTON_FINAL_HEIGHT, exit_button_image)
+        exit_button.draw(WINDOW)
+        pg.display.update()
+
 # Define the main function
 def main():
 
@@ -241,5 +308,17 @@ def main():
         
 # Run the main function only if this file is run as a script        
 if __name__ == "__main__":
-    main()
-    
+    while game_state != -1:
+        if game_state == 0:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    game_state = -1
+                    
+            # pass
+            start_screen()
+            
+        elif game_state == 1:
+            main()
+        
+        elif game_state == 2:
+            end_screen()

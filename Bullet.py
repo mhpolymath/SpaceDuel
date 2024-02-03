@@ -9,7 +9,7 @@ class Bullet():
     
     BULLET_WIDTH = 15
     BULLET_HEIGHT = 8
-    BULLET_VELOCITY = 8
+    BULLET_VELOCITY = 16 #8
     
     #def bullets as pygame rectangles
     def __init__(self,

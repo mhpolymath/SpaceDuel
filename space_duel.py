@@ -24,10 +24,10 @@ pg.init()
 W_WIDTH, W_HEIGHT = 1400, 700
 WINDOW = pg.display.set_mode((W_WIDTH, W_HEIGHT),pg.RESIZABLE)
 pg.display.set_caption("SPACE DUEL!")
-FPS = 120
-SHIP_HIT = pg.USEREVENT + 1
-ALIEN_HIT = pg.USEREVENT + 2
-PLAYER_DEATH = pg.USEREVENT + 3
+FPS = 60
+
+PLAYER_DEATH = pg.USEREVENT + 1
+
 #import fonts for the game
 win_font = gf.GAME_FONT_INACTIVE
 health_font = gf.GAME_FONT_ACTIVE
@@ -56,7 +56,9 @@ def handle_bullets(spaceship, alien,
         bullet.move(spaceship, alien)
         #if player bullet is offscreen, remove it from the player_bullet list
         if bullet.collision(alien):
-            pg.event.post(pg.event.Event(ALIEN_HIT))
+            if alien.health > 0:
+                    alien.health -= 1
+                    print(alien.health)
             spaceship_bullets.remove(bullet)
         
         #if player bullet collides with enemy, remove it from the player_bullet list
@@ -68,13 +70,15 @@ def handle_bullets(spaceship, alien,
         bullet.move(alien, spaceship)
         #if enemy bullet is offscreen, remove it from the enemy_bullet list
         if bullet.collision(spaceship):
-            pg.event.post(pg.event.Event(SHIP_HIT))
+            if spaceship.health > 0:
+                    spaceship.health -= 1
+                    print(spaceship.health)
             alien_bullets.remove(bullet)
         
         #if enemy bullet collides with player, remove it from the enemy_bullet list
         elif bullet.isOffScreen(W_WIDTH):
             alien_bullets.remove(bullet)
- 
+             
 def draw_text_with_outline(x, y,
                            text, font, color, outline_color,
                            surface, thickness = 2): 
@@ -243,25 +247,10 @@ def game_play():
                 game_state = 2
                 return
 
-            #4 event: player hit
-            if event.type == SHIP_HIT:
-                
-                print("SHIP HIT")
-                
-                if spaceship.health > 0:
-                    spaceship.health -= 1
-                    print(spaceship.health)
-
-            #5 event: alien hit
-            if event.type == ALIEN_HIT:
-                print("ALIEN HIT")
-                if alien.health > 0:
-                    alien.health -= 1
-                    print(alien.health)
-            
-            # check with every event if any player has died
-            if spaceship.health <= 0 or alien.health <= 0:
-                pg.event.post(pg.event.Event(PLAYER_DEATH))
+  
+        # check with every frame if any player has died
+        if spaceship.health <= 0 or alien.health <= 0:
+            pg.event.post(pg.event.Event(PLAYER_DEATH))
             
         # Handle player movements
         spaceship.movement_handler()

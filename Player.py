@@ -11,7 +11,7 @@ create a player class for the player and enemy objects (change doc)
 import pygame as pg
 
 class Player():
-    VELOCITY = 5 # velocity of the player: movement per call of handler function
+    VELOCITY = 10 #5 # velocity of the player: movement per call of handler function
     
     def __init__(self, x, y, width, height, image, keys, health = 10, bullets = []):
         

@@ -1,9 +1,10 @@
 #TODO: 
-# - make sure that decisions made to define some stuff outside or inside the main function 
-#       meet the conventions like players, bullet lists, texts to be shown, etc.
+# - make sure that decisions made to define some stuff outside or inside the state functions 
+#       meet the conventions like players, bullet lists, buttons, texts to be shown, etc.
 # - make the file more readable and follows the python PEP8 conventions.
 
 # import statements:
+import math
 import pygame as pg
 import game_colors as gc
 import game_images as gi
@@ -29,13 +30,14 @@ FPS = 60
 PLAYER_DEATH = pg.USEREVENT + 1
 
 #import fonts for the game
+start_screen_font = gf.GAME_FON_START_SCREEN
 win_font = gf.GAME_FONT_INACTIVE
 health_font = gf.GAME_FONT_ACTIVE
 
 #import button images for the game
 start_button_image = gi.START_BUTTON_FINAL_IMAGE.convert_alpha()
-exit_button_image = gi.EXIT_BUTTON_FINAL_IMAGE.convert_alpha()
-reset_button_image = gi.RESET_BUTTON_FINAL_IMAGE.convert_alpha()
+exit_button_image = gi.QUIT_BUTTON_FINAL_IMAGE.convert_alpha()
+reset_button_image = gi.RESTART_BUTTON_FINAL_IMAGE.convert_alpha()
 
 # import images for the game
 spaceship_image = gi.SPACESHIP_FINAL_IMAGE.convert_alpha()
@@ -93,6 +95,15 @@ def draw_text_with_outline(x, y,
         surface.blit(outlineobj, (x+i, y+i))
     surface.blit(textobj, (x,y))
     
+def bounce_text(x, y, text, font, color, outline_color, surface, thickness, bounce_height = 5, bounce_speed = 2):
+    bounce_angle = 0
+    while True:
+        
+        y_offset = math.sin(bounce_angle) * bounce_height
+        draw_text_with_outline(x, y + y_offset, text, font, color, outline_color, surface, thickness)
+        bounce_angle += bounce_speed
+        pg.display.update()  # Update the screen
+        pg.time.delay(100)  # Delay for a short time to control the frame rate
 # Define a function to draw the window
 def draw_window(spaceship, alien,
                 spaceship_bullets = [], alien_bullets = [],
@@ -145,8 +156,10 @@ def start_screen():
         
         
         WINDOW.blit(inactive_background_image, (0,0))
-        start_button = Button(W_WIDTH/3 - gi.START_BUTTON_FINAL_WIDTH/2, W_HEIGHT/2 - gi.START_BUTTON_FINAL_HEIGHT/2, gi.START_BUTTON_FINAL_WIDTH, gi.START_BUTTON_FINAL_HEIGHT, start_button_image)
-        exit_button = Button(2*W_WIDTH/3 - gi.EXIT_BUTTON_FINAL_WIDTH/2, W_HEIGHT/2 - gi.EXIT_BUTTON_FINAL_HEIGHT/2, gi.EXIT_BUTTON_FINAL_WIDTH, gi.EXIT_BUTTON_FINAL_HEIGHT, exit_button_image)
+        # bounce_text(W_WIDTH/2, W_HEIGHT/4, "SPACE DUEL!", start_screen_font, gc.WHITE, gc.BLACK, WINDOW, 5)
+        draw_text_with_outline(W_WIDTH/2, W_HEIGHT/4, "SPACE DUEL!", start_screen_font, gc.WHITE, gc.BLACK, WINDOW, 5)
+        start_button = Button(W_WIDTH/3 - gi.START_BUTTON_FINAL_WIDTH/2, 3*W_HEIGHT/4 - gi.START_BUTTON_FINAL_HEIGHT/2, gi.START_BUTTON_FINAL_WIDTH, gi.START_BUTTON_FINAL_HEIGHT, start_button_image)
+        exit_button = Button(2*W_WIDTH/3 - gi.QUIT_BUTTON_FINAL_WIDTH/2, 3*W_HEIGHT/4 - gi.EXIT_BUTTON_FINAL_HEIGHT/2, gi.QUIT_BUTTON_FINAL_WIDTH, gi.EXIT_BUTTON_FINAL_HEIGHT, exit_button_image)
         start_button.draw(WINDOW)
         # print("start button width: ", start_button.width, "start button height: ", start_button.height)
         # print("exit button width: ", exit_button.width, "exit button height: ", exit_button.height)
@@ -196,7 +209,7 @@ def game_play():
             if event.type == pg.KEYDOWN:
                 
                 #2.1 event: z key pressed
-                if event.key == pg.K_z:
+                if event.key == pg.K_z and len(spaceship_bullets) < 3:
                     if spaceship.x < alien.x:
                         print("Z key pressed")
                         spaceship_bullet = Bullet(spaceship.x + spaceship.width,
@@ -215,7 +228,7 @@ def game_play():
                         print("player 1 bullet created")
                 
                 #2.2 event: / (slash) key pressed
-                if event.key == pg.K_SLASH:
+                if event.key == pg.K_SLASH and len(alien_bullets) < 3:
                     if spaceship.x < alien.x:
                         print("/ key pressed")
                         bullet = Bullet(alien.x,
@@ -284,10 +297,10 @@ def end_screen(winner = ""):
             #handle mouse click on start button
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
-                if reset_button.is_hover(mouse_pos):
+                if restart_button.is_hover(mouse_pos):
                     game_state = 1
                     return
-                elif exit_button.is_hover(mouse_pos):
+                elif quit_button.is_hover(mouse_pos):
                     game_state = -1
                     return
         WINDOW.blit(inactive_background_image, (0,0))
@@ -319,18 +332,18 @@ def end_screen(winner = ""):
                                    WINDOW,
                                    3)
             
-        reset_button = Button(W_WIDTH/3 - gi.RESET_BUTTON_FINAL_WIDTH/2,
-                              W_HEIGHT/2 - gi.RESET_BUTTON_FINAL_HEIGHT/2,
-                              gi.RESET_BUTTON_FINAL_WIDTH,
+        restart_button = Button(2*W_WIDTH/3 - gi.RESTART_BUTTON_FINAL_WIDTH/2,
+                              4*W_HEIGHT/5 - gi.RESET_BUTTON_FINAL_HEIGHT/2,
+                              gi.RESTART_BUTTON_FINAL_WIDTH,
                               gi.RESET_BUTTON_FINAL_HEIGHT,
                               reset_button_image)
-        reset_button.draw(WINDOW)
-        exit_button = Button(2*W_WIDTH/3 - gi.EXIT_BUTTON_FINAL_WIDTH/2,
-                             W_HEIGHT/2 - gi.EXIT_BUTTON_FINAL_HEIGHT/2,
-                             gi.EXIT_BUTTON_FINAL_WIDTH,
+        restart_button.draw(WINDOW)
+        quit_button = Button(W_WIDTH/3 - gi.QUIT_BUTTON_FINAL_WIDTH/2,
+                             4*W_HEIGHT/5 - gi.EXIT_BUTTON_FINAL_HEIGHT/2,
+                             gi.QUIT_BUTTON_FINAL_WIDTH,
                              gi.EXIT_BUTTON_FINAL_HEIGHT,
                              exit_button_image)
-        exit_button.draw(WINDOW)
+        quit_button.draw(WINDOW)
         pg.display.update()
 
 

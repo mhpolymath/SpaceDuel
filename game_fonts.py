@@ -13,3 +13,5 @@ pg.font.init()
 GAME_FONT_ACTIVE = pg.font.Font(os.path.join('Assets', 'Arcade.ttf'), 40)
 #Font to use for static states (i.e. the start button and the end of game text "player x won")
 GAME_FONT_INACTIVE = pg.font.Font(os.path.join('Assets', 'Arcade.ttf'), 70)
+
+GAME_FON_START_SCREEN = pg.font.Font(os.path.join('Assets', 'Arcade.ttf'), 150)

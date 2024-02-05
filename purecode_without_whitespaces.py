@@ -16,8 +16,8 @@ PLAYER_DEATH = pg.USEREVENT + 3
 win_font = gf.GAME_FONT_INACTIVE
 health_font = gf.GAME_FONT_ACTIVE
 start_button_image = gi.START_BUTTON_FINAL_IMAGE
-exit_button_image = gi.EXIT_BUTTON_FINAL_IMAGE
-reset_button_image = gi.RESET_BUTTON_FINAL_IMAGE
+exit_button_image = gi.QUIT_BUTTON_FINAL_IMAGE
+reset_button_image = gi.RESTART_BUTTON_FINAL_IMAGE
 spaceship_image = gi.SPACESHIP_FINAL_IMAGE
 spaceship_image_flipped = gi.FLIPPED_SPACESHIP_IMAGE
 alien_image = gi.ALIEN_FINAL_IMAGE
@@ -88,7 +88,7 @@ def start_screen():
                     return
         WINDOW.blit(inactive_background_image, (0,0))
         start_button = Button(W_WIDTH/3 - gi.START_BUTTON_FINAL_WIDTH/2, W_HEIGHT/2 - gi.START_BUTTON_FINAL_HEIGHT/2, gi.START_BUTTON_FINAL_WIDTH, gi.START_BUTTON_FINAL_HEIGHT, start_button_image)
-        exit_button = Button(2*W_WIDTH/3 - gi.EXIT_BUTTON_FINAL_WIDTH/2, W_HEIGHT/2 - gi.EXIT_BUTTON_FINAL_HEIGHT/2, gi.EXIT_BUTTON_FINAL_WIDTH, gi.EXIT_BUTTON_FINAL_HEIGHT, exit_button_image)
+        exit_button = Button(2*W_WIDTH/3 - gi.QUIT_BUTTON_FINAL_WIDTH/2, W_HEIGHT/2 - gi.EXIT_BUTTON_FINAL_HEIGHT/2, gi.QUIT_BUTTON_FINAL_WIDTH, gi.EXIT_BUTTON_FINAL_HEIGHT, exit_button_image)
         start_button.draw(WINDOW)
         exit_button.draw(WINDOW)
         pg.display.update()
@@ -184,9 +184,9 @@ def end_screen(winner = ""):
             WINDOW.blit(gi.ALIEN_WIN_IMAGE,(W_WIDTH/2 - gi.ALIEN_WIN_IMAGE_WIDTH/2,W_HEIGHT/2 - gi.ALIEN_WIN_IMAGE_HEIGHT/2))
             draw_text_with_outline(W_WIDTH/2,40 + W_HEIGHT/2 + gi.ALIEN_WIN_IMAGE_HEIGHT/2,alien_winning_string, win_font, gc.B_FIRE1,gc.BLACK,WINDOW,3)
             
-        reset_button = Button(W_WIDTH/3 - gi.RESET_BUTTON_FINAL_WIDTH/2,W_HEIGHT/2 - gi.RESET_BUTTON_FINAL_HEIGHT/2,gi.RESET_BUTTON_FINAL_WIDTH, gi.RESET_BUTTON_FINAL_HEIGHT,reset_button_image)
+        reset_button = Button(W_WIDTH/3 - gi.RESTART_BUTTON_FINAL_WIDTH/2,W_HEIGHT/2 - gi.RESET_BUTTON_FINAL_HEIGHT/2,gi.RESTART_BUTTON_FINAL_WIDTH, gi.RESET_BUTTON_FINAL_HEIGHT,reset_button_image)
         reset_button.draw(WINDOW)
-        exit_button = Button(2*W_WIDTH/3 - gi.EXIT_BUTTON_FINAL_WIDTH/2,W_HEIGHT/2 - gi.EXIT_BUTTON_FINAL_HEIGHT/2,gi.EXIT_BUTTON_FINAL_WIDTH,gi.EXIT_BUTTON_FINAL_HEIGHT,exit_button_image)
+        exit_button = Button(2*W_WIDTH/3 - gi.QUIT_BUTTON_FINAL_WIDTH/2,W_HEIGHT/2 - gi.EXIT_BUTTON_FINAL_HEIGHT/2,gi.QUIT_BUTTON_FINAL_WIDTH,gi.EXIT_BUTTON_FINAL_HEIGHT,exit_button_image)
         exit_button.draw(WINDOW)
         pg.display.update()      
 if __name__ == "__main__":
